@@ -7,7 +7,7 @@ pipeline {
     agent { label 'ec2-buildnode' }
 
     environment {
-        ARTIFACTORY = credentials('JFrog')    
+        DOCKER_IMAGE = "devopsdemo/devopsdemo:latest"
     }
 
     triggers {
@@ -32,14 +32,14 @@ pipeline {
         stage('Build docker image') {
             steps {
                 script {
-                    dockerImage = docker.build("devopsdemo/devopsdemo:latest", "-f ./Dockerfile .")
+                    docker.build("$DOCKER_IMAGE", "-f ./Dockerfile .")
                 }
             }
         }
         stage('Scan and push docker image') {
             steps {
-                jf 'docker scan ${dockerImage}'
-                jf 'docker push ${dockerImage}'
+                jf 'docker scan $DOCKER_IMAGE'
+                jf 'docker push $DOCKER_IMAGE'
             }
         }
     }
