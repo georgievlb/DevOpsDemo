@@ -13,19 +13,11 @@ pipeline {
     stages {
         stage('Build the application') {
             steps {
-                script {
-                    echo 'Building the react app...'
-                    npm install
+                echo 'Building the react app...'
+                nodejs(nodeJSInstallationName: 'Node 6.x') {
+                    sh 'cd ./my-app-src && npm install && npm run test'
                 }
             }
         }
-        stage('Run unit tests') {
-            steps {
-                script {
-                    npm run test
-                }
-            }
-        }
-
     }
 }
