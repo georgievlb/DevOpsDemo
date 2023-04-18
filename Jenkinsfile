@@ -10,7 +10,6 @@ pipeline {
         pollSCM('H/5 * * * *')
     }
 
-    tools{nodejs 'node'}
     stages {
         stage('Build the application') {
             steps {
