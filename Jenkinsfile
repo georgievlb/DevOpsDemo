@@ -10,13 +10,12 @@ pipeline {
         pollSCM('H/5 * * * *')
     }
 
+    tools{nodejs 'node'}
     stages {
         stage('Build the application') {
             steps {
                 echo 'Building the react app...'
-                nodejs(nodeJSInstallationName: 'Node 18.x') {
                     sh 'cd ./my-app-src && npm install && npm run test'
-                }
             }
         }
     }
