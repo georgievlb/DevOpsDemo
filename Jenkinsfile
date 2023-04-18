@@ -9,18 +9,25 @@ pipeline {
     triggers {
         pollSCM('H/5 * * * *')
     }
+    
+    tools {
+        jfrog 'jfrog-cli'
+    }
 
     stages {
         stage('Run unit tests') {
             steps {
-                echo 'Building the react app...'
                 sh 'cd ./my-app-src && npm install && npm run test'
             }
         }
         stage('Build application') {
             steps {
-                echo 'Building the react app...'
                 sh 'cd ./my-app-src && npm run build'
+            }
+        }
+        stage('Build docker image') {
+            steps {
+                image = docker.build("devopsdemo/devopsdemo:latest", "-f ./Dockerfile .")
             }
         }
     }
