@@ -15,8 +15,17 @@ pipeline {
             steps {
                 script {
                     echo 'Building the react app...'
+                    npm install
                 }
             }
         }
+        stage('Run unit tests') {
+            steps {
+                script {
+                    npm run test
+                }
+            }
+        }
+
     }
 }
