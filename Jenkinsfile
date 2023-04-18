@@ -28,14 +28,14 @@ pipeline {
         stage('Build docker image') {
             steps {
                 script {
-                    DOCKER_IMAGE = docker.build("devopsdemo/devopsdemo:latest", "-f ./Dockerfile .")
+                    dockerImage = docker.build("devopsdemo/devopsdemo:latest", "-f ./Dockerfile .")
                 }
             }
         }
         stage('Scan and push docker image') {
             steps {
-                jf 'docker scan $DOCKER_IMAGE'
-                jf 'docker push $DOCKER_IMAGE'
+                jf 'docker scan $dockerImage'
+                jf 'docker push $dockerImage'
             }
         }
     }
