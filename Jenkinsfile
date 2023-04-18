@@ -14,7 +14,7 @@ pipeline {
         stage('Build the application') {
             steps {
                 echo 'Building the react app...'
-                    sh 'cd ./my-app-src && npm install && npm run test'
+                sh 'cd ./my-app-src && npm install && npm run test'
             }
         }
     }
