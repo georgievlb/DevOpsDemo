@@ -11,10 +11,16 @@ pipeline {
     }
 
     stages {
-        stage('Build the application') {
+        stage('Run unit tests') {
             steps {
                 echo 'Building the react app...'
                 sh 'cd ./my-app-src && npm install && npm run test'
+            }
+        }
+        stage('Build application') {
+            steps {
+                echo 'Building the react app...'
+                sh 'cd ./my-app-src && npm run build'
             }
         }
     }
