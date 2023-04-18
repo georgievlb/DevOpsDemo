@@ -14,7 +14,7 @@ pipeline {
         stage('Build the application') {
             steps {
                 echo 'Building the react app...'
-                nodejs(nodeJSInstallationName: 'Node 6.x') {
+                nodejs(nodeJSInstallationName: 'Node 18.x') {
                     sh 'cd ./my-app-src && npm install && npm run test'
                 }
             }
