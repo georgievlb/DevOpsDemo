@@ -33,3 +33,5 @@ override.tf.json
 
 # IntelliJ
 .idea
+
+.DS_Store
