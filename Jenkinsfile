@@ -6,6 +6,10 @@ pipeline {
 
     agent { label 'ec2-buildnode' }
 
+    environment {
+        ARTIFACTORY = credentials('JFrog')    
+    }
+
     triggers {
         pollSCM('H/5 * * * *')
     }
@@ -34,8 +38,8 @@ pipeline {
         }
         stage('Scan and push docker image') {
             steps {
-                jf 'docker scan $dockerImage'
-                jf 'docker push $dockerImage'
+                jf 'docker scan ${dockerImage}'
+                jf 'docker push ${dockerImage}'
             }
         }
     }
