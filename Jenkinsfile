@@ -7,7 +7,7 @@ pipeline {
     agent { label 'ec2-buildnode' }
 
     environment {
-        DOCKER_IMAGE = "devopsdemo/devopsdemo:latest"
+        DOCKER_IMAGE = "lbgeorgiev.jfrog.io/devopsdemo/devopsdemo:latest"
     }
 
     triggers {
