@@ -27,7 +27,9 @@ pipeline {
         }
         stage('Build docker image') {
             steps {
-                image = docker.build("devopsdemo/devopsdemo:latest", "-f ./Dockerfile .")
+                script {
+                    image = docker.build("devopsdemo/devopsdemo:latest", "-f ./Dockerfile .")
+                }
             }
         }
     }
