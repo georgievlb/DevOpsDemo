@@ -7,7 +7,7 @@ pipeline {
     agent { label 'ec2-buildnode' }
 
     triggers {
-        pollSCM('H/1 * * * *')
+        pollSCM('H/5 * * * *')
     }
 
     stages {
