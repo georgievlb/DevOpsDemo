@@ -68,7 +68,7 @@ pipeline {
                                 --region ${EKS_AWS_REGION} \\
                                 --template-body 'file://${WORKSPACE}/Infrastructure/eks.yml' \\
                                 --capabilities CAPABILITY_NAMED_IAM
-                                aws cloudformation wait stack-create-complete --stack-name ${EKS_STACK_NAME}
+                                aws cloudformation wait update-stack-complete --stack-name ${EKS_STACK_NAME}
                             """
                         }
                     }
