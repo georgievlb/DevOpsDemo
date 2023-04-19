@@ -118,11 +118,16 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        sh "kubectl rollout restart deployment devopsdemo"
                         sh "kubectl set image deployment/devopsdemo devopsdemo-container=lbgeorgiev.jfrog.io/docker/devopsdemo:1.0.0"
+                        sh "kubectl rollout restart deployment devopsdemo"
                         sh "kubectl apply -f '${WORKSPACE}/Infrastructure/devopsdemo-app.yaml'"
                     }
                 }
+            }
+        }
+        stage('Publish build info') {
+            steps{
+                jf 'rt build-publish'
             }
         }
     }
