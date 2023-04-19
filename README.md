@@ -18,3 +18,13 @@ This CI/CD approach uses the IaC methodology. The infrastructure code is in the 
 - `devopsdemo-app.yaml`:  The kubernetes deployment file
 - `eks.yaml`: The cloudformation template for the EKS cluster
 At root level, the `Jenkinsfile` contains the groovy pipeline code.
+
+## Further improvements
+
+Due to time constraints I designed the CI/CD pipeline as a proof of concept for the task I was given. Given more time I'd improve the following items:
+1. Split the pipeline into multiple pipelines:
+    - deploy aws resources individually e.g. VPC and EKS
+    - build and deploy artifact separately
+2. Add a TerraForm cofiguration to stop relying on CloudFormation
+3. Package the kubernetes resources using Helm
+4. 
