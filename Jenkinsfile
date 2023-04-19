@@ -53,15 +53,17 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        CLUSTER_STATUS=$(aws eks --region params.EKS_AWS_REGION describe-cluster --name params.EKS_CLUSTER_NAME --query "cluster.status" --output text)
-                        if [ "$CLUSTER_STATUS" != "ACTIVE" ]; then
+                        def clusterStatus = sh(returnStdout: true, script: """
+                            aws eks --region ${params.EKS_AWS_REGION} describe-cluster --name ${params.EKS_CLUSTER_NAME} --query "cluster.status" --output text
+                        """).trim()
+                        if (clusterStatus != "ACTIVE") {
                             echo "Deploying EKS Cluster."
                             // aws cloudformation create-stack --stack-name ${EKS_STACK_NAME}
                             // --region ${EKS_AWS_REGION}
                             // --template-body file://${WORKSPACE}/Infrastructure/eks.yml
                             // --capabilities CAPABILITY_NAMED_IAM
                             // aws eks --region ${EKS_AWS_REGION} update-kubeconfig --name ${params.EKS_CLUSTER_NAME}
-                        fi
+                        }
                     }
                 }
             }
