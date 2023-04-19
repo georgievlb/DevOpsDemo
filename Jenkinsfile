@@ -84,11 +84,7 @@ pipeline {
 
                         sh "aws eks --region ${params.EKS_AWS_REGION} update-kubeconfig --name ${env.EKS_CLUSTER_NAME}"
 
-                        sh "kubectl create secret docker-registry artifactorycred \
-                            --docker-server=${dockerServer} \
-                            --docker-username=${dockerUsername} \
-                            --docker-password=${dockerPassword} \
-                            --docker-email=${dockerEmail}"
+                        sh "kubectl create secret docker-registry artifactorycred --docker-server=${dockerServer} --docker-username=${dockerUsername} --docker-password=${dockerPassword} --docker-email=${dockerEmail}"
                     }
                 }
 
