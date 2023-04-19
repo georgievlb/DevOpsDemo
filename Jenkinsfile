@@ -62,7 +62,7 @@ pipeline {
                             sh """
                                 aws cloudformation create-stack --stack-name ${EKS_STACK_NAME} \\
                                 --region ${EKS_AWS_REGION} \\
-                                --template-body 'file://${WORKSPACE}/Infrastructure/eks.yml' \\
+                                --template-body 'file://${WORKSPACE}/Infrastructure/eks.yaml' \\
                                 --capabilities CAPABILITY_NAMED_IAM
                                 aws eks --region ${params.EKS_AWS_REGION} update-kubeconfig --name ${env.EKS_CLUSTER_NAME}
                             """
