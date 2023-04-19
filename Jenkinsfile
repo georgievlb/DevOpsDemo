@@ -44,6 +44,19 @@ pipeline {
                 sh 'cd ./my-app-src && npm run build'
             }
         }
+        stage('Build docker image') {
+            steps {
+                script {
+                    docker.build("$DOCKER_IMAGE", "-f ./Dockerfile .")
+                }
+            }
+        }
+        stage('Scan and push docker image') {
+            steps {
+                jf 'docker scan $DOCKER_IMAGE'
+                jf 'docker push $DOCKER_IMAGE'
+            }
+        }
         stage('Create/Update EKS cluster') {
             steps {
                 script {
@@ -69,7 +82,7 @@ pipeline {
                 }
             }
         }
-        stage('Updaete EKS configuration') {
+        stage('Update EKS configuration') {
             steps {
                 script {
                     withCredentials([
@@ -106,19 +119,6 @@ pipeline {
                         sh "kubectl apply -f '${WORKSPACE}/Infrastructure/devopsdemo-app.yaml'"
                     }
                 }
-            }
-        }
-        stage('Build docker image') {
-            steps {
-                script {
-                    docker.build("$DOCKER_IMAGE", "-f ./Dockerfile .")
-                }
-            }
-        }
-        stage('Scan and push docker image') {
-            steps {
-                jf 'docker scan $DOCKER_IMAGE'
-                jf 'docker push $DOCKER_IMAGE'
             }
         }
     }
