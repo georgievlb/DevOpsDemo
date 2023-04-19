@@ -8,8 +8,9 @@ pipeline {
     agent { label 'ec2-buildnode' }
 
     environment {
-        DOCKER_IMAGE = "lbgeorgiev.jfrog.io/docker/devopsdemo:1.0.0"
+        DOCKER_IMAGE = "lbgeorgiev.jfrog.io/docker/devopsdemo:${env.IMAGE_TAG}"
         EKS_CLUSTER_NAME = "DevOpsDemoEKS"
+        IMAGE_TAG = "${GIT_COMMIT}"
     }
 
     triggers {
@@ -118,7 +119,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        sh "kubectl set image deployment/devopsdemo devopsdemo-container=lbgeorgiev.jfrog.io/docker/devopsdemo:1.0.0"
+                        sh "kubectl set image deployment/devopsdemo devopsdemo-container=${DOCKER_IMAGE}"
                         sh "kubectl rollout restart deployment devopsdemo"
                         sh "kubectl apply -f '${WORKSPACE}/Infrastructure/devopsdemo-app.yaml'"
                     }
