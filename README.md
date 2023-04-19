@@ -1,17 +1,17 @@
 # DevOpsDemo
-This repository contains a sample containerized React application.
+This repository contains a sample containerized React application deployed on AWS EKS in the us-east-1 region.
 
 ## Deployment
 
-1. The application uses a Jenkins server, specially deployed for this task, located at this IP address: `http://3.82.248.215:8080/`. The code for the Jenkins groovy declarative pipeline is in the `Infrastructure` directory.
+1. The application uses a Jenkins server, specially deployed for this task, located at this IP address: http://3.82.248.215:8080/. The code for the Jenkins groovy declarative pipeline is in the `Infrastructure` directory.
 2. After a git commit is pushed to this repository the pipeline is triggered: http://3.82.248.215:8080/job/DevOpsDemo/job/master/ The Jenkins pipeline uses a scheduled cron expression as a trigger that polls the source control every 5 minutes.
     - The pipeline installs the react app dependencies, runs its unit tests and then builds it.
-    - Next, it builds a docker image, scans it and pushes it to the Artifactory Container registry. For the purposes of this demo, I created a trial account in Artifactory and specially created a private container registry which I integrated with the pipeline. The goal is to showcase a real life use case - storing container images in a private registry and integrating the pipeline with it.
+    - Next, it builds a docker image, scans it and pushes it to the Artifactory Container registry. For the purposes of this demo, I created a trial account in Artifactory (https://lbgeorgiev.jfrog.io/) and specially created a private container registry which I integrated with the pipeline. The goal is to showcase a real life use case - storing container images in a private registry and integrating the pipeline with it.
 3. Next, the pipeline Creates/Updates the EKS cluster in AWS.
 4. Next, the EKS cluster configuration is updated.
-5. The application artifact is deployed to the kubernetes cluster.
+5. The application artifact is deployed to the kubernetes cluster in AWS.
 6. The build info is published.
-7. The app can be accessed using the load balancer dns name: http://a4f33aaa44efe4468b66690fdc98c9f4-173778183.us-east-1.elb.amazonaws.com/
+7. The app can be accessed using the AWS load balancer dns name: http://a4f33aaa44efe4468b66690fdc98c9f4-173778183.us-east-1.elb.amazonaws.com/
 
 ## IaC
 
