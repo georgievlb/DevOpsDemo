@@ -11,6 +11,7 @@ This repository contains a sample containerized React application.
 4. Next, the EKS cluster configuration is updated.
 5. The application artifact is deployed to the kubernetes cluster.
 6. The build info is published.
+7. The app can be accessed using the load balancer url here: http://accc39234df6e479f8206f755158e38a-1902106198.us-east-1.elb.amazonaws.com/
 
 ## IaC
 
@@ -27,4 +28,7 @@ Due to time constraints I designed the CI/CD pipeline as a proof of concept for 
     - build and deploy artifact separately
 2. Add a TerraForm cofiguration to stop relying on CloudFormation
 3. Package the kubernetes resources using Helm
-4. 
+4. Update the cloudformation stack if there's a change to the infrastructure
+5. Avoid code repetition in pipeline
+6. Add SSL termination to load balancer
+7. Perform build and test operations inside a container
