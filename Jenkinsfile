@@ -101,6 +101,13 @@ pipeline {
 
             }
         }
+        stage('Deploy artifact') {
+            steps {
+                script {
+                    sh "kubectl create -f 'file://${WORKSPACE}/Infrastructure/devopsdemo-app.yaml'"
+                }
+            }
+        }
         stage('Build docker image') {
             steps {
                 script {
