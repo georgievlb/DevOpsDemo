@@ -62,12 +62,12 @@ pipeline {
         }
         stage('Create/Update EKS cluster') {
             steps {
-                sh """
+                sh '''
                     CLUSTER_STATUS=$(aws eks --region us-east-1 describe-cluster --name DevOpsDemoEKS --query "cluster.status" --output text)
                     if [ "$CLUSTER_STATUS" != "ACTIVE" ]; then
                         echo "Deploying EKS Cluster."
                     fi
-                """
+                '''
             }
         }
     }
