@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: devopsdemo-container
-        image: lbgeorgiev.jfrog.io/docker/devopsdemo:1.0.0
+        image: lbgeorgiev.jfrog.io/docker/devopsdemo:8882a727b5eec0dad1b82f61f8b3a6845916d53e
       imagePullSecrets:
       - name: artifactorycred
 ---
