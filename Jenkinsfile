@@ -77,7 +77,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([
-                        usernamePassword(credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')
+                        usernamePassword(credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY'),
                         string(credentialsId: 'artifactorycred.dockerServer', variable: 'DOCKER_SERVER'),
                         string(credentialsId: 'artifactorycred.dockerUsername', variable: 'DOCKER_USERNAME'),
                         string(credentialsId: 'artifactorycred.dockerPassword', variable: 'DOCKER_PASSWORD'),
