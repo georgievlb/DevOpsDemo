@@ -56,17 +56,23 @@ pipeline {
                         def clusterStatus = sh(returnStdout: true, script: """
                             aws eks --region ${params.EKS_AWS_REGION} describe-cluster --name ${env.EKS_CLUSTER_NAME} --query "cluster.status" --output text
                         """).trim()
-                        if (clusterStatus != "ACTIVE") {
+                        def stackExists = sh(returnStatus: true, script: """
+                            aws cloudformation describe-stacks --stack-name ${EKS_STACK_NAME} --region ${EKS_AWS_REGION}
+                        """)
+                        if (clusterStatus != "ACTIVE" && stackExists != 0) {
                             echo "Deploying EKS Cluster."
-                            // aws cloudformation create-stack --stack-name ${EKS_STACK_NAME}
-                            // --region ${EKS_AWS_REGION}
-                            // --template-body file://${WORKSPACE}/Infrastructure/eks.yml
-                            // --capabilities CAPABILITY_NAMED_IAM
-                            // aws eks --region ${EKS_AWS_REGION} update-kubeconfig --name ${params.EKS_CLUSTER_NAME}
+                            sh """
+                                aws cloudformation create-stack --stack-name ${EKS_STACK_NAME} \\
+                                --region ${EKS_AWS_REGION} \\
+                                --template-body 'file://${WORKSPACE}/Infrastructure/eks.yml' \\
+                                --capabilities CAPABILITY_NAMED_IAM
+                                aws eks --region ${params.EKS_AWS_REGION} update-kubeconfig --name ${env.EKS_CLUSTER_NAME}
+                            """
+                        } else {
+                            echo "Cluster is already active or stack '${EKS_STACK_NAME}' already exists. Skipping stack creation."
                         }
                     }
                 }
-            }
         }
         stage('Build docker image') {
             steps {
