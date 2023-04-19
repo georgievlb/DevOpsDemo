@@ -121,7 +121,6 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         sh "kubectl set image deployment/devopsdemo devopsdemo-container=${DOCKER_IMAGE}"
                         sh "kubectl rollout restart deployment devopsdemo"
-                        sh "kubectl apply -f '${WORKSPACE}/Infrastructure/devopsdemo-app.yaml'"
                     }
                 }
             }
