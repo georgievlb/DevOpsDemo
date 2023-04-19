@@ -92,13 +92,12 @@ pipeline {
                         string(credentialsId: 'artifactorycred.dockerPassword', variable: 'DOCKER_PASSWORD'),
                         string(credentialsId: 'artifactorycred.dockerEmail', variable: 'DOCKER_EMAIL')
                         ]) {
-                        sh "aws eks --region ${params.EKS_AWS_REGION} update-kubeconfig --name ${env.EKS_CLUSTER_NAME}"
-
-                        def dockerServer = env.DOCKER_SERVER
-                        def dockerUsername = env.DOCKER_USERNAME
-                        def dockerPassword = env.DOCKER_PASSWORD
-                        def dockerEmail = env.DOCKER_EMAIL
-                        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                        try {
+                            sh "aws eks --region ${params.EKS_AWS_REGION} update-kubeconfig --name ${env.EKS_CLUSTER_NAME}"
+                            def dockerServer = env.DOCKER_SERVER
+                            def dockerUsername = env.DOCKER_USERNAME
+                            def dockerPassword = env.DOCKER_PASSWORD
+                            def dockerEmail = env.DOCKER_EMAIL
                             sh """
                                 kubectl create secret docker-registry artifactorycred \
                                 --docker-server=${dockerServer} \
@@ -106,6 +105,9 @@ pipeline {
                                 --docker-password=${dockerPassword} \
                                 --docker-email=${dockerEmail}
                             """
+                        } catch (Exception e) {
+                            echo "Secret already created. Skipping EKS configuration update"
+                            return
                         }
                     }
                 }
