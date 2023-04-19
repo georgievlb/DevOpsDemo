@@ -31,11 +31,6 @@ pipeline {
             defaultValue: 'us-east-1',
             description: 'The AWS region.'
         )
-        booleanParam(
-            name: 'DEPLOY_TO_AWS',
-            defaultValue: false,
-            description: 'Check this if you want to deploy to AWS.'
-        )
     }
 
     stages {
