@@ -1,3 +1,4 @@
+/* groovylint-disable LineLength */
 pipeline {
     options {
         timestamps()
@@ -8,6 +9,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "lbgeorgiev.jfrog.io/docker/devopsdemo:1.0.0"
+        EKS_CLUSTER_NAME = "DevOpsDemoEKS"
     }
 
     triggers {
@@ -47,6 +49,23 @@ pipeline {
                 sh 'cd ./my-app-src && npm run build'
             }
         }
+        stage('Create/Update EKS cluster') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        CLUSTER_STATUS=$(aws eks --region params.EKS_AWS_REGION describe-cluster --name params.EKS_CLUSTER_NAME --query "cluster.status" --output text)
+                        if [ "$CLUSTER_STATUS" != "ACTIVE" ]; then
+                            echo "Deploying EKS Cluster."
+                            // aws cloudformation create-stack --stack-name ${EKS_STACK_NAME}
+                            // --region ${EKS_AWS_REGION}
+                            // --template-body file://${WORKSPACE}/Infrastructure/eks.yml
+                            // --capabilities CAPABILITY_NAMED_IAM
+                            // aws eks --region ${EKS_AWS_REGION} update-kubeconfig --name ${params.EKS_CLUSTER_NAME}
+                        fi
+                    }
+                }
+            }
+        }
         stage('Build docker image') {
             steps {
                 script {
@@ -58,16 +77,6 @@ pipeline {
             steps {
                 jf 'docker scan $DOCKER_IMAGE'
                 jf 'docker push $DOCKER_IMAGE'
-            }
-        }
-        stage('Create/Update EKS cluster') {
-            steps {
-                sh '''
-                    CLUSTER_STATUS=$(aws eks --region us-east-1 describe-cluster --name DevOpsDemoEKS --query "cluster.status" --output text)
-                    if [ "$CLUSTER_STATUS" != "ACTIVE" ]; then
-                        echo "Deploying EKS Cluster."
-                    fi
-                '''
             }
         }
     }
