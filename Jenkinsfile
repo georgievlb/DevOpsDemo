@@ -101,7 +101,9 @@ pipeline {
         stage('Deploy artifact') {
             steps {
                 script {
-                    sh "kubectl create -f 'file://${WORKSPACE}/Infrastructure/devopsdemo-app.yaml'"
+                    withCredentials([usernamePassword(credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        sh "kubectl create -f 'file://${WORKSPACE}/Infrastructure/devopsdemo-app.yaml'"
+                    }
                 }
             }
         }
