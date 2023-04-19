@@ -11,7 +11,7 @@ This repository contains a sample containerized React application.
 4. Next, the EKS cluster configuration is updated.
 5. The application artifact is deployed to the kubernetes cluster.
 6. The build info is published.
-7. The app can be accessed using the load balancer dns name.
+7. The app can be accessed using the load balancer dns name: http://a4f33aaa44efe4468b66690fdc98c9f4-173778183.us-east-1.elb.amazonaws.com/
 
 ## IaC
 
