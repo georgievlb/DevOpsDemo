@@ -3,7 +3,7 @@ This repository contains a sample containerized React application.
 
 ## Deployment
 
-1. The application uses a specially deployed Jenkins server located at this IP address: `http://3.82.248.215:8080/`. The code for the Jenkins groovy declarative pipeline is in the `Infrastructure` directory.
+1. The application uses a Jenkins server, specially deployed for this task, located at this IP address: `http://3.82.248.215:8080/`. The code for the Jenkins groovy declarative pipeline is in the `Infrastructure` directory.
 2. After a git commit is pushed to this repository the pipeline is triggered: http://3.82.248.215:8080/job/DevOpsDemo/job/master/ The Jenkins pipeline uses a scheduled cron expression as a trigger that polls the source control every 5 minutes.
     - The pipeline installs the react app, runs its unit tests and then builds it.
     - Next, it creates a docker image, scans it and pushes it to the Artifactory Container registry. For the purposes of this demo, I created a trial account in Artifactory and specially created a private container registry which I integrated with the pipeline.
@@ -24,13 +24,13 @@ At root level, the `Jenkinsfile` contains the groovy pipeline code.
 
 Due to time constraints I designed the CI/CD pipeline as a proof of concept for the task I was given. Given more time I'd improve the following items:
 1. Split the pipeline into multiple pipelines:
-    - deploy aws resources individually e.g. VPC and EKS
-    - build and deploy artifact separately
+    - deploy aws resources in individual pipelines e.g. VPC and EKS
+    - build and deploy artifact in a separate pipeline
 2. Add a TerraForm cofiguration to stop relying on CloudFormation
 3. Package the kubernetes resources using Helm
 4. Update the cloudformation stack when there's a change to the yaml template
-5. Avoid code repetition in pipeline
-6. Break down pipeline into more granular steps.
+5. Improve code quality of the pipeline e.g. avoid code repetition, refactor longer methods
+6. Break down pipeline into more granular steps
 7. Add SSL termination to load balancer
 8. Perform build and test operations inside a container
 9. Test the pipeline more thoroughly
