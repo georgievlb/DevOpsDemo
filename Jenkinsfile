@@ -77,14 +77,23 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        def dockerServer = credentials('artifactorycred.dockerServer')
-                        def dockerUsername = credentials('artifactorycred.dockerUsername')
-                        def dockerPassword = credentials('artifactorycred.dockerPassword')
-                        def dockerEmail = credentials('artifactorycred.dockerEmail')
-
                         sh "aws eks --region ${params.EKS_AWS_REGION} update-kubeconfig --name ${env.EKS_CLUSTER_NAME}"
 
-                        sh "kubectl create secret docker-registry artifactorycred --docker-server=${dockerServer} --docker-username=${dockerUsername} --docker-password=${dockerPassword} --docker-email=${dockerEmail}"
+                        string(credentialsId: 'artifactorycred.dockerServer', variable: 'DOCKER_SERVER'),
+                        string(credentialsId: 'artifactorycred.dockerUsername', variable: 'DOCKER_USERNAME'),
+                        string(credentialsId: 'artifactorycred.dockerPassword', variable: 'DOCKER_PASSWORD'),
+                        string(credentialsId: 'artifactorycred.dockerEmail', variable: 'DOCKER_EMAIL')
+                        def dockerServer = env.DOCKER_SERVER
+                        def dockerUsername = env.DOCKER_USERNAME
+                        def dockerPassword = env.DOCKER_PASSWORD
+                        def dockerEmail = env.DOCKER_EMAIL
+                        sh """
+                            kubectl create secret docker-registry artifactorycred \
+                            --docker-server=${dockerServer} \
+                            --docker-username=${dockerUsername} \
+                            --docker-password=${dockerPassword} \
+                            --docker-email=${dockerEmail}
+                        """
                     }
                 }
 
