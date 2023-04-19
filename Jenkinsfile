@@ -76,13 +76,15 @@ pipeline {
         stage('Updaete EKS configuration') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        sh "aws eks --region ${params.EKS_AWS_REGION} update-kubeconfig --name ${env.EKS_CLUSTER_NAME}"
-
+                    withCredentials([
+                        usernamePassword(credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')
                         string(credentialsId: 'artifactorycred.dockerServer', variable: 'DOCKER_SERVER'),
                         string(credentialsId: 'artifactorycred.dockerUsername', variable: 'DOCKER_USERNAME'),
                         string(credentialsId: 'artifactorycred.dockerPassword', variable: 'DOCKER_PASSWORD'),
                         string(credentialsId: 'artifactorycred.dockerEmail', variable: 'DOCKER_EMAIL')
+                        ]) {
+                        sh "aws eks --region ${params.EKS_AWS_REGION} update-kubeconfig --name ${env.EKS_CLUSTER_NAME}"
+
                         def dockerServer = env.DOCKER_SERVER
                         def dockerUsername = env.DOCKER_USERNAME
                         def dockerPassword = env.DOCKER_PASSWORD
