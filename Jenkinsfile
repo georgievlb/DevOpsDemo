@@ -63,6 +63,13 @@ pipeline {
                             """
                         } else {
                             echo "Cluster is already active or stack '${EKS_STACK_NAME}' already exists. Attempting to update stack."
+                            sh """
+                                aws cloudformation update-stack --stack-name ${EKS_STACK_NAME} \\
+                                --region ${EKS_AWS_REGION} \\
+                                --template-body 'file://${WORKSPACE}/Infrastructure/eks.yml' \\
+                                --capabilities CAPABILITY_NAMED_IAM
+                                aws cloudformation wait stack-create-complete --stack-name ${EKS_STACK_NAME}
+                            """
                         }
                     }
                 }
@@ -102,7 +109,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        sh "kubectl create -f 'file://${WORKSPACE}/Infrastructure/devopsdemo-app.yaml'"
+                        sh "kubectl create -f '${WORKSPACE}/Infrastructure/devopsdemo-app.yaml'"
                     }
                 }
             }
