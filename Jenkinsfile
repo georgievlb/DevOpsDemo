@@ -73,10 +73,12 @@ pipeline {
                 }
             }
         }
-        stage('Configure EKS cluster') {
+        stage('Updaete EKS configuration') {
             steps {
                 script {
-                    sh([script: "aws eks --region ${params.EKS_AWS_REGION} update-kubeconfig --name ${env.EKS_CLUSTER_NAME}"])
+                    withCredentials([usernamePassword(credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        sh([script: "aws eks --region ${params.EKS_AWS_REGION} update-kubeconfig --name ${env.EKS_CLUSTER_NAME}"])
+                    }
                 }
             }
         }
