@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devopsdemo
+spec:
+  selector:
+    matchLabels:
+      app: devopsdemo
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: devopsdemo
+    spec:
+      containers:
+      - name: devopsdemo-container
+        image: lbgeorgiev.jfrog.io/docker/devopsdemo:1.0.0
+      imagePullSecrets:
+      - name: artifactorycred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: devopsdemo-service
+spec:
+  selector:
+    app: devopsdemo
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer

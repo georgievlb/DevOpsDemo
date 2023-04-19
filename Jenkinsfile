@@ -1,4 +1,4 @@
-/* groovylint-disable LineLength, NestedBlockDepth */
+/* groovylint-disable DuplicateMapLiteral, LineLength, NestedBlockDepth */
 pipeline {
     options {
         timestamps()
@@ -77,9 +77,21 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        sh([script: "aws eks --region ${params.EKS_AWS_REGION} update-kubeconfig --name ${env.EKS_CLUSTER_NAME}"])
+                        def dockerServer = credentials('artifactorycred.dockerServer')
+                        def dockerUsername = credentials('artifactorycred.dockerUsername')
+                        def dockerPassword = credentials('artifactorycred.dockerPassword')
+                        def dockerEmail = credentials('artifactorycred.dockerEmail')
+
+                        sh "aws eks --region ${params.EKS_AWS_REGION} update-kubeconfig --name ${env.EKS_CLUSTER_NAME}"
+
+                        sh "kubectl create secret docker-registry artifactorycred \
+                            --docker-server=${dockerServer} \
+                            --docker-username=${dockerUsername} \
+                            --docker-password=${dockerPassword} \
+                            --docker-email=${dockerEmail}"
                     }
                 }
+
             }
         }
         stage('Build docker image') {
