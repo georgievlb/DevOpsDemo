@@ -64,12 +64,19 @@ pipeline {
                                 --region ${EKS_AWS_REGION} \\
                                 --template-body 'file://${WORKSPACE}/Infrastructure/eks.yaml' \\
                                 --capabilities CAPABILITY_NAMED_IAM
-                                aws eks --region ${params.EKS_AWS_REGION} update-kubeconfig --name ${env.EKS_CLUSTER_NAME}
+                                aws cloudformation wait stack-create-complete --stack-name ${EKS_STACK_NAME}
                             """
                         } else {
                             echo "Cluster is already active or stack '${EKS_STACK_NAME}' already exists. Attempting to update stack."
                         }
                     }
+                }
+            }
+        }
+        stage('Configure EKS cluster') {
+            steps {
+                script {
+                    sh([script: "aws eks --region ${params.EKS_AWS_REGION} update-kubeconfig --name ${env.EKS_CLUSTER_NAME}"])
                 }
             }
         }
