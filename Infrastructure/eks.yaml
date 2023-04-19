@@ -51,11 +51,11 @@ Parameters:
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
   AvailabilityZonePublicSubnet01:
     Type: CommaDelimitedList<AWS::EC2::AvailabilityZone::Name>
-    Default: eu-west-3a
+    Default: us-east-1a
     Description: Availability Zone for the Public Subnet 01.
   AvailabilityZonePublicSubnet02:
     Type: CommaDelimitedList<AWS::EC2::AvailabilityZone::Name>
-    Default: eu-west-3b
+    Default: us-east-1b
     Description: Availability Zone for the Public Subnet 02.
 Resources:
   EksVPC:
