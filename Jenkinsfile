@@ -84,13 +84,15 @@ pipeline {
                         def dockerUsername = env.DOCKER_USERNAME
                         def dockerPassword = env.DOCKER_PASSWORD
                         def dockerEmail = env.DOCKER_EMAIL
-                        sh """
-                            kubectl create secret docker-registry artifactorycred \
-                            --docker-server=${dockerServer} \
-                            --docker-username=${dockerUsername} \
-                            --docker-password=${dockerPassword} \
-                            --docker-email=${dockerEmail}
-                        """
+                        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                            sh """
+                                kubectl create secret docker-registry artifactorycred \
+                                --docker-server=${dockerServer} \
+                                --docker-username=${dockerUsername} \
+                                --docker-password=${dockerPassword} \
+                                --docker-email=${dockerEmail}
+                            """
+                        }
                     }
                 }
 
