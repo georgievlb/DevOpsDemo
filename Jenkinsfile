@@ -69,10 +69,11 @@ pipeline {
                                 aws eks --region ${params.EKS_AWS_REGION} update-kubeconfig --name ${env.EKS_CLUSTER_NAME}
                             """
                         } else {
-                            echo "Cluster is already active or stack '${EKS_STACK_NAME}' already exists. Skipping stack creation."
+                            echo "Cluster is already active or stack '${EKS_STACK_NAME}' already exists. Attempting to update stack."
                         }
                     }
                 }
+            }
         }
         stage('Build docker image') {
             steps {
