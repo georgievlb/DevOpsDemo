@@ -7,7 +7,7 @@ pipeline {
     agent { label 'ec2-buildnode' }
 
     environment {
-        DOCKER_IMAGE = "lbgeorgiev.jfrog.io/devopsdemo/devopsdemo:latest"
+        DOCKER_IMAGE = "lbgeorgiev.jfrog.io/docker/devopsdemo:1.0.0"
     }
 
     triggers {
@@ -16,6 +16,24 @@ pipeline {
     
     tools {
         jfrog 'jfrog-cli'
+    }
+
+    parameters {
+        string(
+            name: 'EKS_STACK_NAME',
+            defaultValue: 'devopsdemo',
+            description: 'The AWS EKS CloudFormation stack name.'
+        )
+        string(
+            name: 'EKS_AWS_REGION',
+            defaultValue: 'us-east-1',
+            description: 'The AWS region.'
+        )
+        booleanParam(
+            name: 'DEPLOY_TO_AWS',
+            defaultValue: false,
+            description: 'Check this if you want to deploy to AWS.'
+        )
     }
 
     stages {
