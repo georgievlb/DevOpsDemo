@@ -53,13 +53,11 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        def clusterStatus = sh(returnStdout: true, script: """
-                            aws eks --region ${params.EKS_AWS_REGION} describe-cluster --name ${env.EKS_CLUSTER_NAME} --query "cluster.status" --output text
-                        """).trim()
+
                         def stackExists = sh(returnStatus: true, script: """
                             aws cloudformation describe-stacks --stack-name ${EKS_STACK_NAME} --region ${EKS_AWS_REGION}
                         """)
-                        if (clusterStatus != "ACTIVE" && stackExists != 0) {
+                        if (stackExists != 0) {
                             echo "Deploying EKS Cluster."
                             sh """
                                 aws cloudformation create-stack --stack-name ${EKS_STACK_NAME} \\
