@@ -63,13 +63,7 @@ pipeline {
                             """
                         } else {
                             echo "Cluster is already active or stack '${EKS_STACK_NAME}' already exists. Attempting to update stack."
-                            sh """
-                                aws cloudformation update-stack --stack-name ${EKS_STACK_NAME} \\
-                                --region ${EKS_AWS_REGION} \\
-                                --template-body 'file://${WORKSPACE}/Infrastructure/eks.yml' \\
-                                --capabilities CAPABILITY_NAMED_IAM
-                                aws cloudformation wait update-stack-complete --stack-name ${EKS_STACK_NAME}
-                            """
+
                         }
                     }
                 }
