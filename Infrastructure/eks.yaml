@@ -1,0 +1,226 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This template contains the required resources for the DevOpsDemo EKS cluster.
+Parameters:
+  EKSClusterName:
+    Type: String
+    Default: DevOpsDemoEKS
+  EKSVersion:
+    Type: String
+    Default: 1.25
+    Description: The version of the EKS cluster. Defaults to latest.
+  EKSNodeGroupName:
+    Type: String
+    Default: NodeGroup01
+  EKSDesiredWorkerNode:
+    Type: Number
+    Default: 2
+    MinValue: 1
+    MaxValue: 7
+  EKSWorkerNodeInstanceType:
+    Type: String
+    Default: t2.micro
+    AllowedValues: [t2.nano, t2.micro, t2.small, t2.medium]
+    ConstraintDescription: Must be a valid EC2 instance type
+    Description: EC2 instance type for the node instances. Defaults to t2.micro to fit into AWS free tier.
+  EKSIAMRoleName:
+    Type: String
+    Default: DevOpsDemoEKSClusterRole
+    Description: The name of the IAM role for the EKS service to assume.
+  EKSKeyPair:
+    Type: "AWS::EC2::KeyPair::KeyName"
+    Default: "devopsdemo-key"
+    Description: The name of Key Pair to etasblish connection with Worker Node.
+  VpcCidrBlock:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: The CIDR range for the VPC. This should be a valid private (RFC 1918) CIDR range.
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+  PublicSubnet01Block:
+    Type: String
+    Default: 10.0.0.0/24
+    Description: CidrBlock for public subnet 01 within the VPC.
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+  PublicSubnet02Block:
+    Type: String
+    Default: 10.0.1.0/24
+    Description: CidrBlock for public subnet 02 within the VPC.
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+  AvailabilityZonePublicSubnet01:
+    Type: CommaDelimitedList<AWS::EC2::AvailabilityZone::Name>
+    Default: eu-west-3a
+    Description: Availability Zone for the Public Subnet 01.
+  AvailabilityZonePublicSubnet02:
+    Type: CommaDelimitedList<AWS::EC2::AvailabilityZone::Name>
+    Default: eu-west-3b
+    Description: Availability Zone for the Public Subnet 02.
+Resources:
+  EksVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-VPC'
+        - Key: Project
+          Value: devopsdemo
+  EksInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-InternetGateway'
+        - Key: Project
+          Value: devopsdemo
+  EksVPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref EksInternetGateway
+      VpcId: !Ref EksVPC
+  EksPublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref EksVPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-RouteTable'
+        - Key: Project
+          Value: devopsdemo
+  EksPublicRoute:
+    DependsOn: EksVPCGatewayAttachment
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref EksPublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref EksInternetGateway
+  EksPublicSubnet01:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Ref AvailabilityZonePublicSubnet01
+      MapPublicIpOnLaunch: true
+      CidrBlock:
+        Ref: PublicSubnet01Block
+      VpcId:
+        Ref: EksVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PublicSubnet01"
+        - Key: Project
+          Value: devopsdemo
+  EksPublicSubnet02:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Ref AvailabilityZonePublicSubnet02
+      MapPublicIpOnLaunch: true
+      CidrBlock:
+        Ref: PublicSubnet02Block
+      VpcId:
+        Ref: EksVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PublicSubnet02"
+        - Key: Project
+          Value: devopsdemo
+  EksPublicSubnet01RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref EksPublicSubnet01
+      RouteTableId: !Ref EksPublicRouteTable
+  EksPublicSubnet02RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref EksPublicSubnet02
+      RouteTableId: !Ref EksPublicRouteTable
+  EksSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Cluster communication with worker nodes
+      VpcId: !Ref EksVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-SecurityGroup"
+        - Key: Project
+          Value: devopsdemo
+  EksIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - eks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      RoleName: !Ref EKSIAMRoleName
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+  EksCluster:
+    Type: AWS::EKS::Cluster
+    Properties:
+      Name: !Ref EKSClusterName
+      Version: !Ref EKSVersion
+      RoleArn:
+        "Fn::GetAtt": ["EksIAMRole", "Arn"]
+      ResourcesVpcConfig:
+        SecurityGroupIds:
+          - !Ref EksSecurityGroup
+        SubnetIds:
+          - !Ref EksPublicSubnet01
+          - !Ref EksPublicSubnet02
+    DependsOn: [EksIAMRole, EksPublicSubnet01, EksPublicSubnet02, EksSecurityGroup]
+  EksNodeInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/AmazonEKS_CNI_Policy"
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+      Path: /
+  EksNodeGroup:
+    Type: AWS::EKS::Nodegroup
+    Properties:
+      ClusterName: !Ref EKSClusterName
+      NodeRole:
+        "Fn::GetAtt": ["EksNodeInstanceRole", "Arn"]
+      AmiType: AL2_x86_64
+      InstanceTypes:
+        - !Ref EKSWorkerNodeInstanceType
+      NodegroupName: !Ref EKSNodeGroupName
+      RemoteAccess:
+        Ec2SshKey: !Ref EKSKeyPair
+      ScalingConfig:
+        MinSize: 1
+        DesiredSize: !Ref EKSDesiredWorkerNode
+        MaxSize: 7
+      Labels:
+        Project: devopsdemo
+      Subnets:
+        - !Ref EksPublicSubnet01
+        - !Ref EksPublicSubnet02
+    DependsOn: [EksCluster, EksNodeInstanceRole]
+Outputs:
+  SubnetIds:
+    Description: Subnets IDs in the EksVPC
+    Value: !Join [ ",", [ !Ref EksPublicSubnet01, !Ref EksPublicSubnet02 ] ]
+  SecurityGroups:
+    Description: Security group for the cluster control plane communication with worker nodes
+    Value: !Join [ ",", [ !Ref EksSecurityGroup ] ]
+  VpcId:
+    Description: The EksVPC Id
+    Value: !Ref EksVPC
