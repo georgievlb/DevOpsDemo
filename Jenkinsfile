@@ -1,4 +1,4 @@
-/* groovylint-disable LineLength */
+/* groovylint-disable LineLength, NestedBlockDepth */
 pipeline {
     options {
         timestamps()
@@ -54,7 +54,7 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         def clusterStatus = sh(returnStdout: true, script: """
-                            aws eks --region ${params.EKS_AWS_REGION} describe-cluster --name ${params.EKS_CLUSTER_NAME} --query "cluster.status" --output text
+                            aws eks --region ${params.EKS_AWS_REGION} describe-cluster --name ${env.EKS_CLUSTER_NAME} --query "cluster.status" --output text
                         """).trim()
                         if (clusterStatus != "ACTIVE") {
                             echo "Deploying EKS Cluster."
